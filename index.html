@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FORMA — Studio Ceramics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cream:       #F4EEE4;
+      --warm-white:  #FAF7F4;
+      --clay:        #C4673A;
+      --clay-dark:   #9E4E25;
+      --dark:        #1C1812;
+      --mid:         #2A241E;
+      --stone:       #8B7D73;
+      --light-stone: #C8BDB7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── NAV ──────────────────────────────────── */
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 4rem;
+      transition: background 0.5s, backdrop-filter 0.5s;
+    }
+
+    nav.scrolled {
+      background: rgba(28,24,18,0.92);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+
+    .nav-links a {
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--light-stone);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--cream); }
+
+    /* ─── HERO ─────────────────────────────────── */
+    .hero {
+      height: 100vh;
+      min-height: 700px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 72% 48%, rgba(196,103,58,0.14) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 40% at 20% 80%, rgba(139,125,115,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 2.2rem;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.3s;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(5.5rem, 16vw, 15rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+      opacity: 0;
+      animation: fadeUp 1.3s ease forwards 0.5s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title .accent { color: var(--clay); }
+
+    .hero-meta {
+      margin-top: 3.5rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.95s;
+    }
+
+    .hero-rule { width: 56px; height: 1px; background: var(--stone); flex-shrink: 0; }
+
+    .hero-tagline {
+      font-size: 0.88rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: var(--stone);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 3.5rem;
+      right: 4rem;
+      writing-mode: vertical-rl;
+      font-size: 0.62rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--stone);
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.3s;
+    }
+
+    .hero-scroll::after {
+      content: '';
+      width: 1px;
+      height: 56px;
+      background: linear-gradient(to bottom, var(--stone), transparent);
+      transform: scaleY(0);
+      transform-origin: top;
+      animation: lineGrow 1.2s ease forwards 1.7s;
+    }
+
+    /* ─── TICKER ───────────────────────────────── */
+    .ticker {
+      background: var(--clay);
+      padding: 0.85rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      animation: ticker 22s linear infinite;
+    }
+
+    .ticker span {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(250,247,244,0.9);
+      padding: 0 2.5rem;
+    }
+
+    .ticker span.dot { padding: 0; color: rgba(250,247,244,0.5); }
+
+    /* ─── ABOUT ────────────────────────────────── */
+    .about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--warm-white);
+      color: var(--dark);
+      min-height: 70vh;
+    }
+
+    .about-text {
+      padding: 9rem 5rem 9rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .label {
+      font-size: 0.64rem;
+      font-weight: 600;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 2.5rem;
+    }
+
+    .about-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.6rem, 4vw, 4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--dark);
+      margin-bottom: 2.2rem;
+    }
+
+    .about-body {
+      font-size: 0.97rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: #4A3F38;
+      max-width: 46ch;
+    }
+
+    .about-body + .about-body { margin-top: 1.4rem; }
+
+    .about-visual {
+      background: var(--mid);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .about-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(196,103,58,0.28) 0%, transparent 55%),
+        radial-gradient(circle at 65% 65%, rgba(139,125,115,0.18) 0%, transparent 50%);
+    }
+
+    /* CSS Vessel */
+    .vessel-wrap {
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 24px 48px rgba(0,0,0,0.7));
+    }
+
+    .vessel-rim {
+      width: 70px;
+      height: 14px;
+      background: linear-gradient(180deg, #CB7248 0%, #9E4E25 100%);
+      border-radius: 50%;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+    }
+
+    .vessel-neck {
+      width: 54px;
+      height: 46px;
+      background: linear-gradient(170deg, #B5612F 0%, #8B4A1E 100%);
+      margin: 0 auto;
+      border-radius: 2px 2px 18px 18px;
+      position: relative;
+      top: -2px;
+      box-shadow: inset -5px 0 14px rgba(0,0,0,0.35);
+    }
+
+    .vessel-body {
+      width: 148px;
+      height: 210px;
+      background: linear-gradient(145deg, #D4906A 0%, #C4673A 28%, #924522 58%, #5A2C10 88%, #3A1C0A 100%);
+      border-radius: 50% 50% 46% 54% / 14% 14% 86% 86%;
+      margin: 0 auto;
+      position: relative;
+      top: -8px;
+      box-shadow:
+        inset -18px -20px 40px rgba(0,0,0,0.45),
+        inset 10px 8px 28px rgba(255,185,130,0.12);
+    }
+
+    /* ─── COLLECTION ───────────────────────────── */
+    .collection {
+      padding: 8rem 4rem;
+      background: var(--dark);
+    }
+
+    .collection-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+    }
+
+    .collection-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5.5vw, 5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1;
+    }
+
+    .view-all {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--clay);
+      text-decoration: none;
+      border-bottom: 1px solid var(--clay);
+      padding-bottom: 3px;
+      transition: opacity 0.3s;
+      white-space: nowrap;
+      margin-bottom: 0.4rem;
+    }
+
+    .view-all:hover { opacity: 0.65; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: 340px 340px;
+      gap: 1.2rem;
+    }
+
+    .piece {
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .piece-inner {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.25,0,0,1);
+    }
+
+    .piece:hover .piece-inner { transform: scale(1.04); }
+
+    .piece-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 2.5rem 1.8rem 1.6rem;
+      background: linear-gradient(to top, rgba(28,24,18,0.88) 0%, transparent 100%);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--cream);
+      letter-spacing: 0.03em;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+
+    .piece:hover .piece-label { opacity: 1; }
+
+    .p1 { grid-column: 1 / 6;  grid-row: 1; }
+    .p2 { grid-column: 6 / 9;  grid-row: 1; }
+    .p3 { grid-column: 9 / 13; grid-row: 1 / 3; }
+    .p4 { grid-column: 1 / 4;  grid-row: 2; }
+    .p5 { grid-column: 4 / 9;  grid-row: 2; }
+
+    .p1 .piece-inner {
+      background: linear-gradient(148deg, #D4956A 0%, #C4673A 32%, #7A3A1A 68%, #3E1C08 100%);
+    }
+    .p2 .piece-inner {
+      background: linear-gradient(162deg, #E2DBD4 0%, #C8BDB7 28%, #908680 55%, #5A5450 85%, #3A3432 100%);
+    }
+    .p3 .piece-inner {
+      background: linear-gradient(124deg, #221A14 0%, #3C2E22 18%, #7A5A46 42%, #C4673A 70%, #E8905A 90%, #D4784A 100%);
+    }
+    .p4 .piece-inner {
+      background: linear-gradient(172deg, #EDE5DB 0%, #D4C8BE 38%, #A89C94 72%, #7A706A 100%);
+    }
+    .p5 .piece-inner {
+      background: linear-gradient(138deg, #3D2418 0%, #6B3C28 28%, #B8633A 58%, #E08C5C 82%, #C4723A 100%);
+    }
+
+    /* ─── QUOTE ────────────────────────────────── */
+    .quote-section {
+      background: var(--cream);
+      color: var(--dark);
+      padding: 10rem 4rem;
+      text-align: center;
+    }
+
+    .quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 3.5vw, 3.6rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.45;
+      max-width: 820px;
+      margin: 0 auto 2.8rem;
+      color: var(--dark);
+    }
+
+    .quote em {
+      font-style: normal;
+      color: var(--clay);
+    }
+
+    .quote-attr {
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    /* ─── PROCESS ──────────────────────────────── */
+    .process {
+      background: var(--mid);
+      padding: 9rem 4rem;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 5rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3.8rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--cream);
+    }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+    }
+
+    .step {
+      padding: 3rem 2.5rem;
+      border: 1px solid rgba(196,103,58,0.18);
+      border-radius: 2px;
+      transition: border-color 0.4s;
+    }
+
+    .step:hover { border-color: rgba(196,103,58,0.45); }
+
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.8rem;
+      font-weight: 300;
+      color: rgba(196,103,58,0.22);
+      line-height: 1;
+      margin-bottom: 1.8rem;
+      transition: color 0.4s;
+    }
+
+    .step:hover .step-num { color: rgba(196,103,58,0.45); }
+
+    .step-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 1rem;
+    }
+
+    .step-body {
+      font-size: 0.88rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--light-stone);
+    }
+
+    /* ─── CONTACT ──────────────────────────────── */
+    .contact {
+      background: var(--dark);
+      padding: 11rem 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 70% at 50% 50%, rgba(196,103,58,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .contact-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 7.5vw, 8rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1;
+      margin-bottom: 2rem;
+    }
+
+    .contact-sub {
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--stone);
+      margin-bottom: 4rem;
+      letter-spacing: 0.05em;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1.15rem 3.2rem;
+      background: var(--clay);
+      color: var(--warm-white);
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: background 0.35s, transform 0.25s;
+    }
+
+    .btn:hover {
+      background: var(--clay-dark);
+      transform: translateY(-3px);
+    }
+
+    /* ─── FOOTER ───────────────────────────────── */
+    footer {
+      background: var(--mid);
+      padding: 2.8rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(196,103,58,0.12);
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    .footer-copy {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--stone);
+    }
+
+    .footer-links { display: flex; gap: 2.2rem; list-style: none; }
+
+    .footer-links a {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--stone);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover { color: var(--cream); }
+
+    /* ─── ANIMATIONS ───────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes lineGrow {
+      to { transform: scaleY(1); }
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.85s ease, transform 0.85s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.32s; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">Forma</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#collection">Collection</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <p class="hero-eyebrow">Studio Ceramics &nbsp;·&nbsp; Portland, Oregon</p>
+    <h1 class="hero-title">For<span class="accent">m</span>a</h1>
+    <div class="hero-meta">
+      <div class="hero-rule"></div>
+      <span class="hero-tagline">Handcrafted pieces shaped by earth and fire</span>
+    </div>
+    <div class="hero-scroll">Scroll</div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>Handcrafted</span><span class="dot">·</span>
+      <span>Limited Edition</span><span class="dot">·</span>
+      <span>Made to Order</span><span class="dot">·</span>
+      <span>Studio Ceramics</span><span class="dot">·</span>
+      <span>Portland, Oregon</span><span class="dot">·</span>
+      <span>Since 2019</span><span class="dot">·</span>
+      <!-- duplicate for seamless loop -->
+      <span>Handcrafted</span><span class="dot">·</span>
+      <span>Limited Edition</span><span class="dot">·</span>
+      <span>Made to Order</span><span class="dot">·</span>
+      <span>Studio Ceramics</span><span class="dot">·</span>
+      <span>Portland, Oregon</span><span class="dot">·</span>
+      <span>Since 2019</span><span class="dot">·</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="about-text">
+      <p class="label reveal">The Studio</p>
+      <h2 class="about-heading reveal reveal-delay-1">Where form<br>meets intention</h2>
+      <p class="about-body reveal reveal-delay-2">Forma is a one-person ceramics studio tucked in the foothills of the Pacific Northwest. Every piece begins as a conversation between hands and earth — shaped on the wheel, finished by feel, and fired in a wood kiln that breathes unpredictability into each glaze.</p>
+      <p class="about-body reveal reveal-delay-3">We make functional work that invites daily use: vessels for flowers, bowls for morning ritual, cups that warm the hands in winter. Nothing here is made twice. Nothing here is made fast.</p>
+    </div>
+    <div class="about-visual">
+      <div class="vessel-wrap">
+        <div class="vessel-rim"></div>
+        <div class="vessel-neck"></div>
+        <div class="vessel-body"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLLECTION -->
+  <section class="collection" id="collection">
+    <div class="collection-head reveal">
+      <h2 class="collection-title">Current Collection</h2>
+      <a href="#" class="view-all">View All Pieces</a>
+    </div>
+    <div class="grid reveal reveal-delay-1">
+      <div class="piece p1">
+        <div class="piece-inner"></div>
+        <div class="piece-label">Terracotta Vessel No. 7</div>
+      </div>
+      <div class="piece p2">
+        <div class="piece-inner"></div>
+        <div class="piece-label">Stone Glaze Bowl</div>
+      </div>
+      <div class="piece p3">
+        <div class="piece-inner"></div>
+        <div class="piece-label">Raku Fire Vase</div>
+      </div>
+      <div class="piece p4">
+        <div class="piece-inner"></div>
+        <div class="piece-label">Morning Cup Set</div>
+      </div>
+      <div class="piece p5">
+        <div class="piece-inner"></div>
+        <div class="piece-label">Ember Serving Dish</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote-section">
+    <blockquote class="quote reveal">
+      "There is no perfection in a hand-thrown piece. There is only the <em>honest mark</em> of a decision made at the wheel, and the quiet beauty of accepting it."
+    </blockquote>
+    <p class="quote-attr reveal reveal-delay-1">— Margot Velde, Founder</p>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" id="process">
+    <div class="section-head">
+      <h2 class="section-title reveal">How we work</h2>
+      <p class="label reveal">The Process</p>
+    </div>
+    <div class="process-grid">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <h3 class="step-title">Earth &amp; Intention</h3>
+        <p class="step-body">Every piece begins with reclaimed stoneware clay sourced from local deposits. We wedge by hand — a ritual that centers both the material and the maker before throwing begins.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <h3 class="step-title">Wheel &amp; Fire</h3>
+        <p class="step-body">Thrown on a kick wheel, each form is pulled slowly, dried under cloth for days, then bisque-fired before the glaze is applied by brush, pour, or dip — never twice the same way.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <h3 class="step-title">Release &amp; Rest</h3>
+        <p class="step-body">A final wood-kiln firing brings ash and flame into contact with the glaze — a collaboration we cannot fully control. The kiln decides the final surface. We accept what it gives.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <h2 class="contact-heading reveal">Commission a piece</h2>
+    <p class="contact-sub reveal reveal-delay-1">All custom work begins with a conversation.</p>
+    <a href="mailto:hello@formaceramics.com" class="btn reveal reveal-delay-2">Get in Touch</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Forma</div>
+    <p class="footer-copy">© 2026 Forma Studio. Portland, Oregon.</p>
+    <ul class="footer-links">
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">Shop</a></li>
+      <li><a href="#">Press</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -48px 0px' });
+
+    reveals.forEach(el => io.observe(el));
+
+    // Sticky nav
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 72);
+    }, { passive: true });
+  </script>
+</body>
+</html>
